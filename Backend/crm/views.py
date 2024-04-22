@@ -7,6 +7,7 @@ from rest_framework.decorators import api_view
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password,check_password
 import random
+import requests
 # Create your views here.
 
 @api_view(['GET','POST'])
@@ -35,7 +36,18 @@ def signin_list(request):
             otp=random.randint(1000,9999)
             details["otp"]=otp
             message = "otp generated"
-            print(details)
+            # print(details)
+            OYP = str(details["otp"])
+            NUMBER = str(details["mobile"])
+            url = "https://www.fast2sms.com/dev/bulkV2"
+            querystring = {
+                "authorization": "<YOUR_AUTH_CODE>",
+                "variables_values": OYP, "route": "otp", "numbers": NUMBER}
+            headers = {
+                'cache-control': "no-cache"
+            }
+            response = requests.request("GET", url, headers=headers, params=querystring)
+            print(response.text)
         except Signup.DoesNotExist:
             # User does not exist or password is incorrect
             message="Login failed"
